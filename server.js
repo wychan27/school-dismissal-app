@@ -31,7 +31,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // Serve static files (HTML, CSS) from the public folder
-app.use(express.static('public'));
+// app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // --- New Route for Parent Portal Landing Page ---
 app.get('/', (req, res) => {
