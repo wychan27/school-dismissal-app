@@ -1,0 +1,9 @@
+{
+  "rewrites": [
+    { "source": "/", "destination": "/parent-portal.html" },
+    { "source": "/register-child", "destination": "/parent-form.html" },
+    { "source": "/parent-portal", "destination": "/parent-portal.html" },
+    { "source": "/edit-schedule", "destination": "/parent_edit_form.html" },
+    { "source": "/admin", "destination": "/admin-dashboard.html" }
+  ]
+}
