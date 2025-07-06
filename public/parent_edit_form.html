@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <title>Edit School Dismissal Schedule</title>
+  <style>
+    .search-section {
+      background-color: #e3f2fd;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+    }
+    
+    .search-form {
+      display: flex;
+      gap: 15px;
+      align-items: end;
+    }
+    
+    .search-form .form-group {
+      flex: 1;
+      margin-bottom: 0;
+    }
+    
+    .search-btn {
+      background-color: #28a745;
+      padding: 10px 20px;
+      height: fit-content;
+    }
+    
+    .search-btn:hover {
+      background-color: #218838;
+    }
+    
+    .student-info {
+      background-color: #f8f9fa;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border-left: 4px solid #007bff;
+    }
+    
+    .student-info h3 {
+      margin-top: 0;
+      color: #007bff;
+    }
+    
+    .hidden {
+      display: none;
+    }
+    
+    .error-message {
+      background-color: #f8d7da;
+      color: #721c24;
+      padding: 15px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+    }
+    
+    .success-message {
+      background-color: #d4edda;
+      color: #155724;
+      padding: 15px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Edit Your Child's Dismissal Schedule</h1>
+
+    <!-- Search Section -->
+    <div class="search-section">
+      <h2>Find Your Child's Schedule</h2>
+      <p>Enter your child's name and your email to find and edit their dismissal schedule.</p>
+      
+      <div class="search-form">
+        <div class="form-group">
+          <label for="searchFirstName">Child's First Name:</label>
+          <input type="text" id="searchFirstName" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="searchLastName">Child's Last Name:</label>
+          <input type="text" id="searchLastName" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="searchEmail">Parent's Email:</label>
+          <input type="email" id="searchEmail" required>
+        </div>
+        
+        <button type="button" class="search-btn" onclick="searchStudent()">
+          Find Schedule
+        </button>
+      </div>
+    </div>
+
+    <!-- Messages -->
+    <div id="messageArea"></div>
+
+    <!-- Student Info (hidden initially) -->
+    <div id="studentInfo" class="student-info hidden">
+      <h3>Student Information</h3>
+      <p><strong>Name:</strong> <span id="displayName"></span></p>
+      <p><strong>Parent Email:</strong> <span id="displayEmail"></span></p>
+      <p><strong>Parent Phone:</strong> <span id="displayPhone"></span></p>
+    </div>
+
+    <!-- Edit Form (hidden initially) -->
+    <form id="editForm" class="hidden">
+      <input type="hidden" id="studentId" name="studentId">
+      
+      <div class="section">
+        <h2>Update Weekly Pickup Schedule</h2>
+        <p>Make changes to your child's pickup schedule below. Leave fields empty for days when pickup is not needed.</p>
+    
+        <div class="day-schedule">
+          <h3>Monday</h3>
+          <div class="schedule-inputs">
+            <div class="form-group">
+              <label for="mondayTime">Pickup Time:</label>
+              <select id="mondayTime" name="mondayTime">
+                <option value="">No pickup on Monday</option>
+                <option value="2:00 PM">2:00 PM</option>
+                <option value="2:15 PM">2:15 PM</option>
+                <option value="2:30 PM">2:30 PM</option>
+                <option value="2:45 PM">2:45 PM</option>
+                <option value="3:00 PM">3:00 PM</option>
+                <option value="3:15 PM">3:15 PM</option>
+                <option value="3:30 PM">3:30 PM</option>
+                <option value="3:45 PM">3:45 PM</option>
+                <option value="4:00 PM">4:00 PM</option>
+                <option value="4:15 PM">4:15 PM</option>
+                <option value="4:30 PM">4:30 PM</option>
+                <option value="4:45 PM">4:45 PM</option>
+                <option value="5:00 PM">5:00 PM</option>
+                <option value="5:15 PM">5:15 PM</option>
+                <option value="5:30 PM">5:30 PM</option>
+                <option value="5:45 PM">5:45 PM</option>
+                <option value="6:00 PM">6:00 PM</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="mondayLocation">Pickup Location:</label>
+              <select id="mondayLocation" name="mondayLocation">
+                <option value="">Select location...</option>
+                <option value="front entrance">Front Entrance</option>
+                <option value="back entrance">Back Entrance</option>
+                <option value="gym">Gym</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="day-schedule">
+          <h3>Tuesday</h3>
+          <div class="schedule-inputs">
+            <div class="form-group">
+              <label for="tuesdayTime">Pickup Time:</label>
+              <select id="tuesdayTime" name="tuesdayTime">
+                <option value="">No pickup on Tuesday</option>
+                <option value="2:00 PM">2:00 PM</option>
+                <option value="2:15 PM">2:15 PM</option>
+                <option value="2:30 PM">2:30 PM</option>
+                <option value="2:45 PM">2:45 PM</option>
+                <option value="3:00 PM">3:00 PM</option>
+                <option value="3:15 PM">3:15 PM</option>
+                <option value="3:30 PM">3:30 PM</option>
+                <option value="3:45 PM">3:45 PM</option>
+                <option value="4:00 PM">4:00 PM</option>
+                <option value="4:15 PM">4:15 PM</option>
+                <option value="4:30 PM">4:30 PM</option>
+                <option value="4:45 PM">4:45 PM</option>
+                <option value="5:00 PM">5:00 PM</option>
+                <option value="5:15 PM">5:15 PM</option>
+                <option value="5:30 PM">5:30 PM</option>
+                <option value="5:45 PM">5:45 PM</option>
+                <option value="6:00 PM">6:00 PM</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="tuesdayLocation">Pickup Location:</label>
+              <select id="tuesdayLocation" name="tuesdayLocation">
+                <option value="">Select location...</option>
+                <option value="front entrance">Front Entrance</option>
+                <option value="back entrance">Back Entrance</option>
+                <option value="gym">Gym</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="day-schedule">
+          <h3>Wednesday</h3>
+          <div class="schedule-inputs">
+            <div class="form-group">
+              <label for="wednesdayTime">Pickup Time:</label>
+              <select id="wednesdayTime" name="wednesdayTime">
+                <option value="">No pickup on Wednesday</option>
+                <option value="2:00 PM">2:00 PM</option>
+                <option value="2:15 PM">2:15 PM</option>
+                <option value="2:30 PM">2:30 PM</option>
+                <option value="2:45 PM">2:45 PM</option>
+                <option value="3:00 PM">3:00 PM</option>
+                <option value="3:15 PM">3:15 PM</option>
+                <option value="3:30 PM">3:30 PM</option>
+                <option value="3:45 PM">3:45 PM</option>
+                <option value="4:00 PM">4:00 PM</option>
+                <option value="4:15 PM">4:15 PM</option>
+                <option value="4:30 PM">4:30 PM</option>
+                <option value="4:45 PM">4:45 PM</option>
+                <option value="5:00 PM">5:00 PM</option>
+                <option value="5:15 PM">5:15 PM</option>
+                <option value="5:30 PM">5:30 PM</option>
+                <option value="5:45 PM">5:45 PM</option>
+                <option value="6:00 PM">6:00 PM</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="wednesdayLocation">Pickup Location:</label>
+              <select id="wednesdayLocation" name="wednesdayLocation">
+                <option value="">Select location...</option>
+                <option value="front entrance">Front Entrance</option>
+                <option value="back entrance">Back Entrance</option>
+                <option value="gym">Gym</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="day-schedule">
+          <h3>Thursday</h3>
+          <div class="schedule-inputs">
+            <div class="form-group">
+              <label for="thursdayTime">Pickup Time:</label>
+              <select id="thursdayTime" name="thursdayTime">
+                <option value="">No pickup on Thursday</option>
+                <option value="2:00 PM">2:00 PM</option>
+                <option value="2:15 PM">2:15 PM</option>
+                <option value="2:30 PM">2:30 PM</option>
+                <option value="2:45 PM">2:45 PM</option>
+                <option value="3:00 PM">3:00 PM</option>
+                <option value="3:15 PM">3:15 PM</option>
+                <option value="3:30 PM">3:30 PM</option>
+                <option value="3:45 PM">3:45 PM</option>
+                <option value="4:00 PM">4:00 PM</option>
+                <option value="4:15 PM">4:15 PM</option>
+                <option value="4:30 PM">4:30 PM</option>
+                <option value="4:45 PM">4:45 PM</option>
+                <option value="5:00 PM">5:00 PM</option>
+                <option value="5:15 PM">5:15 PM</option>
+                <option value="5:30 PM">5:30 PM</option>
+                <option value="5:45 PM">5:45 PM</option>
+                <option value="6:00 PM">6:00 PM</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="thursdayLocation">Pickup Location:</label>
+              <select id="thursdayLocation" name="thursdayLocation">
+                <option value="">Select location...</option>
+                <option value="front entrance">Front Entrance</option>
+                <option value="back entrance">Back Entrance</option>
+                <option value="gym">Gym</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="day-schedule">
+          <h3>Friday</h3>
+          <div class="schedule-inputs">
+            <div class="form-group">
+              <label for="fridayTime">Pickup Time:</label>
+              <select id="fridayTime" name="fridayTime">
+                <option value="">No pickup on Friday</option>
+                <option value="2:00 PM">2:00 PM</option>
+                <option value="2:15 PM">2:15 PM</option>
+                <option value="2:30 PM">2:30 PM</option>
+                <option value="2:45 PM">2:45 PM</option>
+                <option value="3:00 PM">3:00 PM</option>
+                <option value="3:15 PM">3:15 PM</option>
+                <option value="3:30 PM">3:30 PM</option>
+                <option value="3:45 PM">3:45 PM</option>
+                <option value="4:00 PM">4:00 PM</option>
+                <option value="4:15 PM">4:15 PM</option>
+                <option value="4:30 PM">4:30 PM</option>
+                <option value="4:45 PM">4:45 PM</option>
+                <option value="5:00 PM">5:00 PM</option>
+                <option value="5:15 PM">5:15 PM</option>
+                <option value="5:30 PM">5:30 PM</option>
+                <option value="5:45 PM">5:45 PM</option>
+                <option value="6:00 PM">6:00 PM</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="fridayLocation">Pickup Location:</label>
+              <select id="fridayLocation" name="fridayLocation">
+                <option value="">Select location...</option>
+                <option value="front entrance">Front Entrance</option>
+                <option value="back entrance">Back Entrance</option>
+                <option value="gym">Gym</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Submit button -->
+      <div class="section">
+        <button type="button" onclick="updateSchedule()">Update Schedule</button>
+        <button type="button" onclick="cancelEdit()" style="background-color: #6c757d; margin-left: 10px;">Cancel</button>
+      </div>
+
+    </form>
+  </div>
+
+  <script>
+    let currentStudentData = null;
+
+    function showMessage(message, isError = false) {
+      const messageArea = document.getElementById('messageArea');
+      messageArea.innerHTML = `
+        <div class="${isError ? 'error-message' : 'success-message'}">
+          ${message}
+        </div>
+      `;
+      
+      // Scroll to message
+      messageArea.scrollIntoView({ behavior: 'smooth' });
+      
+      // Auto-hide success messages after 5 seconds
+      if (!isError) {
+        setTimeout(() => {
+          messageArea.innerHTML = '';
+        }, 5000);
+      }
+    }
+
+    async function searchStudent() {
+      const firstName = document.getElementById('searchFirstName').value.trim();
+      const lastName = document.getElementById('searchLastName').value.trim();
+      const email = document.getElementById('searchEmail').value.trim();
+
+      if (!firstName || !lastName || !email) {
+        showMessage('Please fill in all search fields.', true);
+        return;
+      }
+
+      // Show loading message
+      showMessage('Searching for student...');
+
+      try {
+        const response = await fetch('/api/search-student', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            firstName: firstName,
+            lastName: lastName,
+            parentEmail: email
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        
+        if (data.success) {
+          currentStudentData = data.student;
+          displayStudentInfo(data.student);
+          loadCurrentSchedule(data.student.id);
+          showMessage('Student found! You can now edit the schedule below.');
+        } else {
+          showMessage(data.message || 'Student not found. Please check the information and try again.', true);
+        }
+      } catch (error) {
+        console.error('Search error:', error);
+        showMessage('Error searching for student. Please try again.', true);
+      }
+    }
+
+    function displayStudentInfo(student) {
+      document.getElementById('displayName').textContent = `${student.first_name} ${student.last_name}`;
+      document.getElementById('displayEmail').textContent = student.parent_email;
+      document.getElementById('displayPhone').textContent = student.parent_phone;
+      document.getElementById('studentId').value = student.id;
+      
+      // Show student info and form
+      document.getElementById('studentInfo').classList.remove('hidden');
+      document.getElementById('editForm').classList.remove('hidden');
+    }
+
+    async function loadCurrentSchedule(studentId) {
+      try {
+        const response = await fetch(`/api/student/${studentId}/schedules`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const schedules = await response.json();
+        
+        // Clear all form fields first
+        const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+        days.forEach(day => {
+          document.getElementById(day + 'Time').value = '';
+          document.getElementById(day + 'Location').value = '';
+        });
+
+        // Fill in existing schedule data
+        schedules.forEach(schedule => {
+          const day = schedule.day_of_week.toLowerCase();
+          document.getElementById(day + 'Time').value = schedule.pickup_time;
+          document.getElementById(day + 'Location').value = schedule.pickup_location;
+        });
+
+      } catch (error) {
+        console.error('Error loading current schedule:', error);
+        showMessage('Error loading current schedule. Please try again.', true);
+      }
+    }
+
+    async function updateSchedule() {
+      const studentId = document.getElementById('studentId').value;
+      
+      if (!studentId) {
+        showMessage('Student ID is missing. Please search for the student again.', true);
+        return;
+      }
+
+      // Collect form data
+      const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+      const scheduleData = [];
+
+      days.forEach(day => {
+        const time = document.getElementById(day + 'Time').value;
+        const location = document.getElementById(day + 'Location').value;
+        
+        if (time && location) {
+          scheduleData.push({
+            day: day.charAt(0).toUpperCase() + day.slice(1),
+            time: time,
+            location: location
+          });
+        }
+      });
+
+      // Show loading message
+      showMessage('Updating schedule...');
+
+      try {
+        const response = await fetch('/api/update-schedule', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            studentId: studentId,
+            schedules: scheduleData
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        
+        if (data.success) {
+          showMessage('Schedule updated successfully! The changes will be reflected in the admin dashboard.');
+        } else {
+          showMessage(data.message || 'Failed to update schedule. Please try again.', true);
+        }
+      } catch (error) {
+        console.error('Update error:', error);
+        showMessage('Error updating schedule. Please try again.', true);
+      }
+    }
+
+    function cancelEdit() {
+      // Clear form and hide sections
+      document.getElementById('studentInfo').classList.add('hidden');
+      document.getElementById('editForm').classList.add('hidden');
+      document.getElementById('messageArea').innerHTML = '';
+      
+      // Clear search fields
+      document.getElementById('searchFirstName').value = '';
+      document.getElementById('searchLastName').value = '';
+      document.getElementById('searchEmail').value = '';
+      
+      currentStudentData = null;
+    }
+
+    // Add Enter key support for search fields
+    document.addEventListener('DOMContentLoaded', function() {
+      const searchFields = ['searchFirstName', 'searchLastName', 'searchEmail'];
+      searchFields.forEach(fieldId => {
+        document.getElementById(fieldId).addEventListener('keypress', function(e) {
+          if (e.key === 'Enter') {
+            searchStudent();
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>
