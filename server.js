@@ -30,13 +30,101 @@ pool.connect((err, client, release) => {
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+// Simple session storage (in production, use Redis or database)
+const sessions = new Map();
+
+// Generate a simple session ID
+function generateSessionId() {
+    return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+}
+
+// Middleware to check if user is logged in as admin
+function requireAdminAuth(req, res, next) {
+    const sessionId = req.headers.cookie?.split('admin_session=')[1]?.split(';')[0];
+    
+    if (!sessionId || !sessions.has(sessionId)) {
+        return res.redirect('/admin-login');
+    }
+    
+    const session = sessions.get(sessionId);
+    if (session.role !== 'admin') {
+        return res.redirect('/admin-login');
+    }
+    
+    next();
+}
+
 // Serve static files (HTML, CSS) from the public folder
-// app.use(express.static('public'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // --- New Route for Parent Portal Landing Page ---
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'parent-portal.html'));
+});
+
+// --- Route for Admin Login Page ---
+app.get('/admin-login', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'admin-login.html'));
+});
+
+// --- API route for admin login ---
+// In your server.js, replace the admin login route with this:
+
+app.post('/api/admin-login', (req, res) => {
+    const { username, password } = req.body;
+    
+    // Get credentials from environment variables
+    const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
+    const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+    
+    // Check if environment variables are set
+    if (!ADMIN_USERNAME || !ADMIN_PASSWORD) {
+        console.error('Admin credentials not configured in environment variables');
+        return res.json({ success: false, message: 'Server configuration error' });
+    }
+    
+    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+        // Create a session
+        const sessionId = generateSessionId();
+        sessions.set(sessionId, {
+            username: username,
+            role: 'admin',
+            loginTime: new Date()
+        });
+        
+        // Set session cookie
+        res.cookie('admin_session', sessionId, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 24 * 60 * 60 * 1000 // 24 hours
+        });
+        
+        res.json({ success: true, message: 'Login successful' });
+    } else {
+        res.json({ success: false, message: 'Invalid username or password' });
+    }
+});
+
+// --- API route for admin logout ---
+app.post('/api/admin-logout', (req, res) => {
+    const sessionId = req.headers.cookie?.split('admin_session=')[1]?.split(';')[0];
+    
+    if (sessionId && sessions.has(sessionId)) {
+        sessions.delete(sessionId);
+    }
+    
+    res.clearCookie('admin_session');
+    res.json({ success: true, message: 'Logged out successfully' });
+});
+
+// --- Protected Route for Admin Dashboard ---
+app.get('/admin-dashboard', requireAdminAuth, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'admin-dashboard.html'));
+});
+
+// --- OLD /admin route now redirects to login ---
+app.get('/admin', (req, res) => {
+    res.redirect('/admin-login');
 });
 
 // --- Existing Route for Parent Registration Form ---
@@ -100,13 +188,10 @@ app.post('/register', async (req, res) => {
     }
 });
 
-// Route to serve the admin dashboard
-app.get('/admin', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'admin-dashboard.html'));
-});
+// --- PROTECTED API ROUTES (require admin login) ---
 
 // API route to get schedules for a specific day
-app.get('/api/schedules/:day', async (req, res) => {
+app.get('/api/schedules/:day', requireAdminAuth, async (req, res) => {
     const day = req.params.day;
     const dayCapitalized = day.charAt(0).toUpperCase() + day.slice(1);
     
@@ -134,7 +219,7 @@ app.get('/api/schedules/:day', async (req, res) => {
 });
 
 // API route to get summary statistics
-app.get('/api/summary', async (req, res) => {
+app.get('/api/summary', requireAdminAuth, async (req, res) => {
     const queries = {
         totalStudents: 'SELECT COUNT(*) as count FROM students',
         totalSchedules: 'SELECT COUNT(*) as count FROM pickup_schedules',
@@ -172,7 +257,7 @@ app.get('/api/summary', async (req, res) => {
 });
 
 // API route to get all students
-app.get('/api/students', async (req, res) => {
+app.get('/api/students', requireAdminAuth, async (req, res) => {
     const query = `
         SELECT 
             s.id,
@@ -197,7 +282,7 @@ app.get('/api/students', async (req, res) => {
 });
 
 // API route to get all schedules for a specific student
-app.get('/api/student/:id/schedules', async (req, res) => {
+app.get('/api/student/:id/schedules', requireAdminAuth, async (req, res) => {
     const studentId = req.params.id;
     
     const query = `
