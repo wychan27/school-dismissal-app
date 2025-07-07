@@ -69,6 +69,31 @@
       z-index: 1;
     }
 
+    .logout-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-family: 'Minion Pro', serif;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+      z-index: 2;
+    }
+
+    .logout-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+      border-color: rgba(255, 255, 255, 0.5);
+      transform: translateY(-2px);
+    }
+
     .main-content {
       padding: 50px 40px;
     }
@@ -356,6 +381,13 @@
         letter-spacing: 2px;
       }
       
+      .logout-btn {
+        top: 15px;
+        right: 15px;
+        padding: 8px 16px;
+        font-size: 0.8rem;
+      }
+      
       .main-content {
         padding: 30px 20px;
       }
@@ -394,6 +426,7 @@
 <body>
   <div class="container">
     <div class="header">
+      <button class="logout-btn" onclick="logout()">🚪 Logout</button>
       <h1>Dismissal Dashboard</h1>
       <div class="subtitle">Administrative Overview & Student Pickup Coordination</div>
     </div>
@@ -450,6 +483,30 @@
   <script>
     let allSchedules = [];
     let allStudents = [];
+
+    // Function to logout
+    async function logout() {
+      try {
+        const response = await fetch('/api/admin-logout', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          // Logout successful - redirect to login page
+          window.location.href = '/admin-login';
+        } else {
+          alert('Logout failed. Please try again.');
+        }
+      } catch (error) {
+        console.error('Logout error:', error);
+        alert('Error logging out. Please try again.');
+      }
+    }
 
     // Function to show a specific day
     function showDay(day) {
