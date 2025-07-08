@@ -410,33 +410,57 @@
     }
 
     async function loadCurrentSchedule(studentId) {
-      try {
-        const response = await fetch(`/api/student/${studentId}/schedules`);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const schedules = await response.json();
-        
-        // Clear all form fields first
-        const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
-        days.forEach(day => {
-          document.getElementById(day + 'Time').value = '';
-          document.getElementById(day + 'Location').value = '';
-        });
-
-        // Fill in existing schedule data
-        schedules.forEach(schedule => {
-          const day = schedule.day_of_week.toLowerCase();
-          document.getElementById(day + 'Time').value = schedule.pickup_time;
-          document.getElementById(day + 'Location').value = schedule.pickup_location;
-        });
-
-      } catch (error) {
-        console.error('Error loading current schedule:', error);
-        showMessage('Error loading current schedule. Please try again.', true);
-      }
+  try {
+    // Use the student data we already have from the search
+    if (!currentStudentData) {
+      throw new Error('No student data available');
     }
+    
+    const response = await fetch('/api/parent/student-schedule', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        firstName: currentStudentData.first_name,
+        lastName: currentStudentData.last_name,
+        parentEmail: currentStudentData.parent_email
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    if (!data.success) {
+      throw new Error(data.message || 'Failed to load schedule');
+    }
+    
+    const schedules = data.schedules;
+    
+    // Clear all form fields first
+    const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+    days.forEach(day => {
+      document.getElementById(day + 'Time').value = '';
+      document.getElementById(day + 'Location').value = '';
+    });
+
+    // Fill in existing schedule data
+    schedules.forEach(schedule => {
+      if (schedule.day_of_week && schedule.pickup_time && schedule.pickup_location) {
+        const day = schedule.day_of_week.toLowerCase();
+        document.getElementById(day + 'Time').value = schedule.pickup_time;
+        document.getElementById(day + 'Location').value = schedule.pickup_location;
+      }
+    });
+
+  } catch (error) {
+    console.error('Error loading current schedule:', error);
+    showMessage('Error loading current schedule. Please try again.', true);
+  }
+}
 
     async function updateSchedule() {
       const studentId = document.getElementById('studentId').value;
