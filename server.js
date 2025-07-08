@@ -350,6 +350,54 @@ app.post('/api/search-student', async (req, res) => {
     }
 });
 
+// Added new Edit schedule functionality
+// API route for parents to get their child's schedule (no admin auth required)
+app.post('/api/parent/student-schedule', async (req, res) => {
+    const { firstName, lastName, parentEmail } = req.body;
+    
+    if (!firstName || !lastName || !parentEmail) {
+        return res.json({ success: false, message: 'Missing required fields' });
+    }
+    
+    const query = `
+        SELECT 
+            s.id,
+            s.first_name,
+            s.last_name,
+            ps.day_of_week,
+            ps.pickup_time,
+            ps.pickup_location
+        FROM students s
+        LEFT JOIN pickup_schedules ps ON s.id = ps.student_id
+        WHERE s.first_name = $1 AND s.last_name = $2 AND s.parent_email = $3
+        ORDER BY 
+            CASE ps.day_of_week
+                WHEN 'Monday' THEN 1
+                WHEN 'Tuesday' THEN 2
+                WHEN 'Wednesday' THEN 3
+                WHEN 'Thursday' THEN 4
+                WHEN 'Friday' THEN 5
+            END
+    `;
+    
+    try {
+        const result = await pool.query(query, [firstName, lastName, parentEmail]);
+        
+        if (result.rows.length === 0) {
+            return res.json({ 
+                success: false, 
+                message: 'Student not found. Please check the name and email address.' 
+            });
+        }
+        
+        res.json({ success: true, schedules: result.rows });
+    } catch (err) {
+        console.error('Error fetching student schedule:', err);
+        res.status(500).json({ success: false, message: 'Database error' });
+    }
+});
+
+
 // API route to update a student's schedule
 app.post('/api/update-schedule', async (req, res) => {
     const { studentId, schedules } = req.body;
