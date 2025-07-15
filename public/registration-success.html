@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Successful Registration</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Additional styles for the parent portal page */
+    .portal-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 80vh; /* Make it take up most of the viewport height */
+      text-align: center;
+    }
+
+    .portal-container h1 {
+      color: #333;
+      margin-bottom: 40px;
+      font-size: 2.5em;
+    }
+
+    .portal-options {
+      display: flex;
+      flex-direction: column;
+      gap: 20px; /* Space between buttons */
+      width: 100%;
+      max-width: 400px; /* Limit width for better appearance */
+    }
+
+    .portal-button {
+      display: block; /* Make buttons take full width of their container */
+      padding: 15px 25px;
+      font-size: 1.2em;
+      text-decoration: none;
+      color: white;
+      border-radius: 8px;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .portal-button.register {
+      background-color: #007bff; /* Blue for registration */
+    }
+
+    .portal-button.register:hover {
+      background-color: #0056b3;
+      transform: translateY(-2px);
+    }
+
+    .portal-button.edit {
+      background-color: #28a745; /* Green for editing */
+    }
+
+    .portal-button.edit:hover {
+      background-color: #218838;
+      transform: translateY(-2px);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 600px) {
+      .portal-container h1 {
+        font-size: 1.8em;
+        margin-bottom: 30px;
+      }
+      .portal-button {
+        font-size: 1em;
+        padding: 12px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container portal-container">
+    <h1>Congratulations! You've successfully registered your child to the School Dismissal Schedule!</h1>
+    <div class="portal-options">
+      <a href="/edit-schedule" class="portal-button edit">Edit an Existing Child's Schedule</a>
+    </div>
+  </div>
+</body>
+</html>
