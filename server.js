@@ -176,7 +176,12 @@ app.post('/register', async (req, res) => {
         
         // Commit the transaction
         await client.query('COMMIT');
+        //add new code - redirect to successful page
+        //res.sendFile(path.join(__dirname, 'public', 'registration-success.html'));
+        // redirect code?
+        return res.redirect('registration-success.html');
         res.send('Registration successful! Student ID: ' + studentId + ' with pickup schedules saved.');
+        
         
     } catch (err) {
         // Rollback the transaction on error
